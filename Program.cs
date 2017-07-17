@@ -10,6 +10,12 @@ namespace lngo
     public interface IOperationToken { }
     public interface IOperation { }
 
+    public enum ExecutionMode
+    {
+        Iterative,
+        Sequential
+    }
+
     public class Token : IOperationToken
     {
         public string Command { get; set; }
@@ -33,11 +39,13 @@ namespace lngo
             RegisterParameterParser("R", ParameterParserFunctions.Replace);
             RegisterParameterParser("G", ParameterParserFunctions.Goto);
             RegisterParameterParser("S", ParameterParserFunctions.Substring);
+            RegisterParameterParser("M", ParameterParserFunctions.Multiply);
 
             // Evaluators
             RegisterEvaluator("R", OperationEvaluators.Replace);
             RegisterEvaluator("V", OperationEvaluators.Reverse);
             RegisterEvaluator("S", OperationEvaluators.Substring);
+            RegisterEvaluator("M", OperationEvaluators.Multiply);
         }
 
         public List<Token> Parse(string input)
@@ -86,39 +94,64 @@ namespace lngo
         //public List<IOperation> Parse(List<Token> tokens) { return null; }
         public string Evalute(List<Token> operations, string input)
         {
-            string cur = input;
+            string cur = "";
             bool executing = true;
             int i = 0;
+            string register = "";
+            string outputBuffer = "";
+            ExecutionMode mode = ExecutionMode.Sequential;
 
-            while (executing)
+            if (operations[0].Command == "I")
             {
-                var curToken = operations[i];
-
-                if (curToken.IsControlFlowCommand)
-                {
-                    if (curToken.Command == "G")
-                    {
-                        if (curToken.Parameters.ElementAt(1) != "0")
-                            i = Int32.Parse(curToken.Parameters.First());
-                        else
-                            i++;
-
-                        var gotoCount = Int32.Parse(curToken.Parameters.ElementAt(1));
-                        if (gotoCount > 0)
-                            curToken.Parameters[1] = (gotoCount - 1).ToString();
-                    }
-                }
-                else
-                {
-                    cur = Evaluators[curToken.Command](curToken, cur);
-                    i++;
-                }
-
-                if (i == operations.Count)
-                    break;
+                mode = ExecutionMode.Iterative;
+                operations.RemoveAt(0);
             }
 
-            return cur;
+            List<string> inputs = new List<string>();
+            if (mode == ExecutionMode.Iterative)
+                inputs = input.ToCharArray().Select(o => o.ToString()).ToList();
+            else
+            {
+                inputs.Add(input);
+            }
+
+            foreach (var inp in inputs)
+            {
+                if (mode == ExecutionMode.Iterative)
+                    i = 0;
+
+                while (executing)
+                {
+                    var curToken = operations[i];
+
+                    if (curToken.IsControlFlowCommand)
+                    {
+                        if (curToken.Command == "G")
+                        {
+                            if (curToken.Parameters.ElementAt(1) != "0")
+                                i = Int32.Parse(curToken.Parameters.First());
+                            else
+                                i++;
+
+                            var gotoCount = Int32.Parse(curToken.Parameters.ElementAt(1));
+                            if (gotoCount > 0)
+                                curToken.Parameters[1] = (gotoCount - 1).ToString();
+                        }
+                    }
+                    else
+                    {
+                        cur = Evaluators[curToken.Command](curToken, inp);
+                        i++;
+                    }
+
+                    outputBuffer += cur;
+
+                    if (i == operations.Count)
+                        break;
+                }
+            }
+
+            return outputBuffer;
         }
 
         // Helpers
@@ -142,7 +175,7 @@ namespace lngo
     {
         static void Main(string[] args)
         {
-            string program = "Ra;aaG0;1VS0;2";
+            string program = "IM3";
             string input = "ab";
 
             var interpreter = new Interpreter();

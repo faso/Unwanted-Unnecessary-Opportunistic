@@ -1,0 +1,9 @@
+C:\Users\dev30\Documents\Memes\Unwanted-Unnecessary-Opportunistic\bin\Debug\netcoreapp1.1\lngo.deps.json
+C:\Users\dev30\Documents\Memes\Unwanted-Unnecessary-Opportunistic\bin\Debug\netcoreapp1.1\lngo.runtimeconfig.json
+C:\Users\dev30\Documents\Memes\Unwanted-Unnecessary-Opportunistic\bin\Debug\netcoreapp1.1\lngo.runtimeconfig.dev.json
+C:\Users\dev30\Documents\Memes\Unwanted-Unnecessary-Opportunistic\bin\Debug\netcoreapp1.1\lngo.dll
+C:\Users\dev30\Documents\Memes\Unwanted-Unnecessary-Opportunistic\bin\Debug\netcoreapp1.1\lngo.pdb
+C:\Users\dev30\Documents\Memes\Unwanted-Unnecessary-Opportunistic\obj\Debug\netcoreapp1.1\lngo.csprojResolveAssemblyReference.cache
+C:\Users\dev30\Documents\Memes\Unwanted-Unnecessary-Opportunistic\obj\Debug\netcoreapp1.1\lngo.AssemblyInfo.cs
+C:\Users\dev30\Documents\Memes\Unwanted-Unnecessary-Opportunistic\obj\Debug\netcoreapp1.1\lngo.dll
+C:\Users\dev30\Documents\Memes\Unwanted-Unnecessary-Opportunistic\obj\Debug\netcoreapp1.1\lngo.pdb

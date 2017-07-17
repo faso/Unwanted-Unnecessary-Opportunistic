@@ -19,6 +19,11 @@ namespace lngo.Evaluators
             return new string(charArray);
         }
 
+        public static string Multiply(Token token, string input)
+        {
+            return String.Concat(Enumerable.Repeat(input, Int32.Parse(token.Parameters[0])));
+        }
+
         public static string Substring(Token token, string input)
         {
             if (token.Parameters.Count == 1)
