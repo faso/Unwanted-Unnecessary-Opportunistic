@@ -13,7 +13,8 @@ namespace lngo
     public enum ExecutionMode
     {
         Iterative,
-        Sequential
+        Sequential,
+        Enumerative
     }
 
     public class Token : IOperationToken
@@ -35,6 +36,8 @@ namespace lngo
             // Control flow operations
             RegisterControlFlowOperation("G");
             RegisterControlFlowOperation("A");
+            RegisterControlFlowOperation("<");
+            RegisterControlFlowOperation("+");
 
             // Parameter parsers
             RegisterParameterParser("R", ParameterParserFunctions.Replace);
@@ -43,12 +46,14 @@ namespace lngo
             RegisterParameterParser("M", ParameterParserFunctions.Multiply);
             RegisterParameterParser("*", ParameterParserFunctions.GetRegister);
             RegisterParameterParser("V", ParameterParserFunctions.Reverse);
+            RegisterParameterParser("P", ParameterParserFunctions.Append);
 
             // Evaluators
             RegisterEvaluator("R", OperationEvaluators.Replace);
             RegisterEvaluator("V", OperationEvaluators.Reverse);
             RegisterEvaluator("S", OperationEvaluators.Substring);
             RegisterEvaluator("M", OperationEvaluators.Multiply);
+            RegisterEvaluator("P", OperationEvaluators.Append);
         }
 
         public List<List<Token>> Parse(string input)
@@ -69,7 +74,7 @@ namespace lngo
                     split = new List<string>();
                     continue;
                 }
-                if (Char.IsUpper(c))
+                if (Char.IsUpper(c) || c == '<' || c == '+')
                 {
                     if (buffer.Length != 0)
                     {
@@ -114,6 +119,7 @@ namespace lngo
         public string Evaluate(List<List<Token>> operations, string input, string register)
         {
             string originalRegister = register;
+            string indexRegister = "0";
             string cur = "";
             bool executing = true;
             int i = 0;
@@ -123,9 +129,15 @@ namespace lngo
             foreach (var part in operations)
             {
                 i = 0;
+                indexRegister = "0";
                 if (part[0].Command == "I")
                 {
                     mode = ExecutionMode.Iterative;
+                    part.RemoveAt(0);
+                }
+                else if (part[0].Command == "E")
+                {
+                    mode = ExecutionMode.Enumerative;
                     part.RemoveAt(0);
                 }
                 else
@@ -136,6 +148,10 @@ namespace lngo
                 List<string> inputs = new List<string>();
                 if (mode == ExecutionMode.Iterative)
                     inputs = input.ToCharArray().Select(o => o.ToString()).ToList();
+                else if (mode == ExecutionMode.Enumerative)
+                {
+                    inputs = Enumerable.Repeat(input, input.Length).ToList();
+                }
                 else
                 {
                     inputs.Add(input);
@@ -143,8 +159,10 @@ namespace lngo
 
                 foreach (var inp in inputs)
                 {
-                    if (mode == ExecutionMode.Iterative)
+                    if (mode == ExecutionMode.Iterative || mode == ExecutionMode.Enumerative)
                         i = 0;
+
+                    cur = inp;
 
                     while (executing)
                     {
@@ -164,6 +182,18 @@ namespace lngo
                                     curToken.Parameters[1] = (gotoCount - 1).ToString();
                             }
 
+                            if (curToken.Command == "<")
+                            {
+                                register = indexRegister;
+                                i++;
+                            }
+
+                            if (curToken.Command == "+")
+                            {
+                                register = (Int32.Parse(register) + 1).ToString();
+                                i++;
+                            }
+
                             if (curToken.Command == "A")
                             {
                                 var num = Int32.Parse(register);
@@ -176,6 +206,13 @@ namespace lngo
                         {
                             int j = 0;
                             var newParams = new List<string>(curToken.Parameters);
+                            var newToken = new Token()
+                            {
+                                Command = curToken.Command,
+                                IsControlFlowCommand = curToken.IsControlFlowCommand,
+                                MetaStorage = curToken.MetaStorage
+                            };
+
                             foreach (var p in curToken.Parameters)
                             {
                                 if (p == "*")
@@ -184,24 +221,30 @@ namespace lngo
                                 if (p == "^")
                                     newParams[j] = originalRegister;
 
+                                if (p == "#")
+                                    newParams[j] = indexRegister;
+
                                 j++;
                             }
-                            curToken.Parameters = newParams;
+                            newToken.Parameters = newParams;
 
-                            cur = Evaluators[curToken.Command](curToken, inp);
+                            cur = Evaluators[curToken.Command](newToken, cur);
                             i++;
                         }
-
-                        if (mode == ExecutionMode.Iterative)
-                            outputBuffer += cur;
-                        else
-                            outputBuffer = cur;
-
-                        cur = "";
 
                         if (i == part.Count)
                             break;
                     }
+                    if (mode == ExecutionMode.Iterative || mode == ExecutionMode.Enumerative)
+                    {
+                        outputBuffer += cur;
+                    }
+                    else
+                        outputBuffer = cur;
+
+                    cur = "";
+
+                    indexRegister = (Int32.Parse(indexRegister) + 1).ToString();
                 }
 
                 input = outputBuffer;
@@ -230,13 +273,14 @@ namespace lngo
     {
         static void Main(string[] args)
         {
-            string program = "IAM*|V^";
-            string input = "This is a fun challenge";
+            string program = "E<+S0;*P ";
+            string input = "boi";
             string register = "0";
 
             var interpreter = new Interpreter();
             var tokens = interpreter.Parse(program);
-            Console.WriteLine(interpreter.Evaluate(tokens, input, register));
+            var output = interpreter.Evaluate(tokens, input, register);
+            Console.WriteLine(output);
             Console.ReadKey();
         }
     }

@@ -40,6 +40,11 @@ namespace lngo.Evaluators
             return String.Concat(Enumerable.Repeat(input, Int32.Parse(token.Parameters[0])));
         }
 
+        public static string Append(Token token, string input)
+        {
+            return input + token.Parameters[0];
+        }
+
         public static string Substring(Token token, string input)
         {
             if (token.Parameters.Count == 1)

@@ -36,5 +36,10 @@ namespace lngo.ParameterParsers
         {
             return new List<string>(input.Split(';'));
         }
+
+        public static List<string> Append(string input)
+        {
+            return new List<string>(input.Split(';'));
+        }
     }
 }
