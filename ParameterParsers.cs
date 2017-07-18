@@ -11,6 +11,11 @@ namespace lngo.ParameterParsers
             return new List<string>(input.Split(';'));
         }
 
+        public static List<string> Reverse(string input)
+        {
+            return new List<string>(input.Split(';'));
+        }
+
         public static List<string> Goto(string input)
         {
             var args = input.Split(';');
@@ -18,6 +23,11 @@ namespace lngo.ParameterParsers
         }
 
         public static List<string> Substring(string input)
+        {
+            return new List<string>(input.Split(';'));
+        }
+
+        public static List<string> GetRegister(string input)
         {
             return new List<string>(input.Split(';'));
         }

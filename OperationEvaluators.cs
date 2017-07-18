@@ -14,9 +14,25 @@ namespace lngo.Evaluators
 
         public static string Reverse(Token token, string input)
         {
-            char[] charArray = input.ToCharArray();
-            Array.Reverse(charArray);
-            return new string(charArray);
+            if (token.Parameters.Count == 1)
+            {
+                if (Int32.Parse(token.Parameters[0]) < 0)
+                {
+                    char[] charArray = input.ToCharArray();
+                    Array.Reverse(charArray);
+                    return new string(charArray);
+                }
+                else
+                {
+                    return input;
+                }
+            }
+            else
+            {
+                char[] charArray = input.ToCharArray();
+                Array.Reverse(charArray);
+                return new string(charArray);
+            }
         }
 
         public static string Multiply(Token token, string input)
