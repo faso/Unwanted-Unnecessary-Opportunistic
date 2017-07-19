@@ -273,14 +273,21 @@ namespace lngo
     {
         static void Main(string[] args)
         {
-            string program = "E<+S0;*P ";
+            string program = "";
             string input = "boi";
             string register = "0";
 
-            var interpreter = new Interpreter();
-            var tokens = interpreter.Parse(program);
-            var output = interpreter.Evaluate(tokens, input, register);
-            Console.WriteLine(output);
+            if (program.Length != 0)
+            {
+                var interpreter = new Interpreter();
+                var tokens = interpreter.Parse(program);
+                var output = interpreter.Evaluate(tokens, input, register);
+                Console.Write(output);
+            }
+            else
+            {
+                Console.Write(input);
+            }
             Console.ReadKey();
         }
     }
