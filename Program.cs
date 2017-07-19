@@ -273,8 +273,8 @@ namespace lngo
     {
         static void Main(string[] args)
         {
-            string program = "";
-            string input = "boi";
+            string program = "P0M31P*";
+            string input = "";
             string register = "0";
 
             if (program.Length != 0)
